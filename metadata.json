@@ -1,0 +1,7 @@
+{
+  "name": "MaintiTrack - Industrial Stock Control",
+  "description": "A comprehensive maintenance stock management system for tracking repairs, borrowing equipment, and digital acknowledgements with AI-powered inventory insights.",
+  "requestFramePermissions": [
+    "camera"
+  ]
+}
