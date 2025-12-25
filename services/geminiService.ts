@@ -3,13 +3,24 @@ import { GoogleGenAI, Type } from "@google/genai";
 import { InventoryItem, TransactionLog } from "../types";
 
 // Always initialize the GoogleGenAI client using a named parameter with process.env.API_KEY.
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+// Initialize safely to avoid crashing if API_KEY is missing
+const apiKey = process.env.API_KEY || '';
+const ai = apiKey ? new GoogleGenAI({ apiKey }) : null;
 
 // FIX: Changed parameter from BorrowRecord[] to TransactionLog[] to match the audit trail data passed in Dashboard.tsx
 export const getInventoryInsights = async (items: InventoryItem[], history: TransactionLog[]) => {
+  if (!ai) {
+    console.warn("Gemini API Key missing. Returning fallback insights.");
+    return {
+      summary: "AI insights unavailable (API Key missing).",
+      alerts: ["System running in offline mode."],
+      recommendations: ["Configure GEMINI_API_KEY in .env for insights."]
+    };
+  }
+
   try {
     const response = await ai.models.generateContent({
-      model: 'gemini-3-flash-preview',
+      model: 'gemini-1.5-flash',
       contents: `Analyze this inventory data and borrowing history. Provide a short summary of stock health, identify frequently borrowed items, and suggest restocking for low items.
       
       Inventory: ${JSON.stringify(items)}
