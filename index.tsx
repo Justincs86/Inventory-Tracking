@@ -2,6 +2,10 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './App';
+import { defineCustomElements } from '@ionic/pwa-elements/loader';
+
+// Register Capacitor UI components for web/PWA
+defineCustomElements(window);
 
 const rootElement = document.getElementById('root');
 if (!rootElement) {

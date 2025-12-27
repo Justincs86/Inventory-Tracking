@@ -1,20 +1,20 @@
 
 import React, { useState, useMemo, useEffect } from 'react';
-import { InventoryItem } from '../types';
-import { 
-  Plus, 
-  Tag, 
-  MapPin, 
-  Settings2, 
-  Save, 
-  X, 
-  Search, 
-  Filter, 
-  Trash2, 
-  CheckCircle, 
-  Edit3, 
-  Sparkles, 
-  Edit2, 
+import { InventoryItem, UserRole } from '../types';
+import {
+  Plus,
+  Tag,
+  MapPin,
+  Settings2,
+  Save,
+  X,
+  Search,
+  Filter,
+  Trash2,
+  CheckCircle,
+  Edit3,
+  Sparkles,
+  Edit2,
   Settings,
   AlertCircle,
   AlertTriangle
@@ -39,11 +39,11 @@ const CATEGORY_PREFIX_MAP: Record<string, string> = {
   'General': 'GEN'
 };
 
-const InventoryList: React.FC<InventoryListProps> = ({ 
-  inventory, 
+const InventoryList: React.FC<InventoryListProps> = ({
+  inventory,
   categories,
-  onAddStock, 
-  onAdjustStock, 
+  onAddStock,
+  onAdjustStock,
   onDeleteItem,
   onDeleteCategory
 }) => {
@@ -52,7 +52,7 @@ const InventoryList: React.FC<InventoryListProps> = ({
   const [adjustingId, setAdjustingId] = useState<string | null>(null);
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
   const [categoryToConfirm, setCategoryToConfirm] = useState<string | null>(null);
-  
+
   const [editCategorySelection, setEditCategorySelection] = useState<string>('');
   const [editManualCategoryName, setEditManualCategoryName] = useState<string>('');
   const [editSku, setEditSku] = useState<string>('');
@@ -118,8 +118,8 @@ const InventoryList: React.FC<InventoryListProps> = ({
 
   const filteredInventory = useMemo(() => {
     return inventory.filter(item => {
-      const matchesSearch = item.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
-                            item.sku.toLowerCase().includes(searchTerm.toLowerCase());
+      const matchesSearch = item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        item.sku.toLowerCase().includes(searchTerm.toLowerCase());
       const matchesCategory = selectedCategory === 'All' || item.category === selectedCategory;
       return matchesSearch && matchesCategory;
     });
@@ -167,7 +167,7 @@ const InventoryList: React.FC<InventoryListProps> = ({
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div className="flex items-center space-x-2">
           <h3 className="text-xl font-bold text-slate-800 dark:text-slate-100 transition-colors">Stock Book</h3>
-          <button 
+          <button
             onClick={() => {
               setShowCategoryManager(!showCategoryManager);
               setCategoryToConfirm(null);
@@ -178,23 +178,23 @@ const InventoryList: React.FC<InventoryListProps> = ({
             <Settings className="w-4 h-4" />
           </button>
         </div>
-        
+
         <div className="flex flex-col sm:flex-row gap-2 w-full md:w-auto">
           <div className="relative flex-grow">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-            <input 
-              type="text" 
-              placeholder="Search items..." 
+            <input
+              type="text"
+              placeholder="Search items..."
               className="pl-10 pr-4 py-2.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl focus:ring-2 ring-blue-500 outline-none w-full md:w-48 lg:w-64 text-slate-800 dark:text-slate-100 transition-colors"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
           </div>
-          
+
           <div className="flex gap-2 w-full sm:w-auto">
             <div className="relative flex-1 sm:flex-initial">
               <Filter className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-              <select 
+              <select
                 className="pl-10 pr-4 py-2.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl focus:ring-2 ring-blue-500 outline-none appearance-none cursor-pointer w-full sm:min-w-[120px] text-slate-800 dark:text-slate-100 transition-colors"
                 value={selectedCategory}
                 onChange={(e) => setSelectedCategory(e.target.value)}
@@ -205,8 +205,8 @@ const InventoryList: React.FC<InventoryListProps> = ({
                 ))}
               </select>
             </div>
-            
-            <button 
+
+            <button
               onClick={() => {
                 setShowAddForm(!showAddForm);
                 setShowCategoryManager(false);
@@ -234,13 +234,12 @@ const InventoryList: React.FC<InventoryListProps> = ({
               const isConfirming = categoryToConfirm === cat;
               const itemCount = inventory.filter(i => i.category === cat).length;
               return (
-                <div 
-                  key={cat} 
-                  className={`group relative flex flex-col justify-center p-4 rounded-xl border transition-all duration-200 ${
-                    isConfirming 
-                      ? 'bg-red-600 border-red-700 shadow-inner' 
-                      : 'bg-slate-50 dark:bg-slate-800/50 border-slate-100 dark:border-slate-800 hover:border-blue-200 hover:bg-white dark:hover:bg-slate-800 hover:shadow-sm'
-                  }`}
+                <div
+                  key={cat}
+                  className={`group relative flex flex-col justify-center p-4 rounded-xl border transition-all duration-200 ${isConfirming
+                    ? 'bg-red-600 border-red-700 shadow-inner'
+                    : 'bg-slate-50 dark:bg-slate-800/50 border-slate-100 dark:border-slate-800 hover:border-blue-200 hover:bg-white dark:hover:bg-slate-800 hover:shadow-sm'
+                    }`}
                 >
                   {!isConfirming ? (
                     <div className="flex items-center justify-between w-full">
@@ -254,7 +253,7 @@ const InventoryList: React.FC<InventoryListProps> = ({
                         </div>
                       </div>
                       {cat !== 'General' && (
-                        <button 
+                        <button
                           onClick={() => setCategoryToConfirm(cat)}
                           className="p-2 text-slate-300 dark:text-slate-600 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-all opacity-0 group-hover:opacity-100"
                           title="Delete Category"
@@ -270,13 +269,13 @@ const InventoryList: React.FC<InventoryListProps> = ({
                         <span className="text-[10px] font-black uppercase tracking-wider">Confirm Delete?</span>
                       </div>
                       <div className="flex space-x-2 w-full">
-                        <button 
+                        <button
                           onClick={() => { onDeleteCategory(cat); setCategoryToConfirm(null); }}
                           className="flex-1 bg-white text-red-600 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest hover:bg-red-50 transition-colors"
                         >
                           DELETE
                         </button>
-                        <button 
+                        <button
                           onClick={() => setCategoryToConfirm(null)}
                           className="px-3 bg-red-700/50 text-white py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest hover:bg-red-700 transition-colors"
                         >
@@ -301,7 +300,7 @@ const InventoryList: React.FC<InventoryListProps> = ({
           <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div className="space-y-1">
               <label className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase">Category</label>
-              <select 
+              <select
                 required
                 className="w-full border-2 border-slate-100 dark:border-slate-800 h-14 px-4 rounded-xl focus:ring-4 ring-blue-50 dark:ring-blue-900/20 outline-none transition-all bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100"
                 value={categorySelection}
@@ -317,9 +316,9 @@ const InventoryList: React.FC<InventoryListProps> = ({
             {categorySelection === 'MANUAL' && (
               <div className="space-y-1 animate-in slide-in-from-left-2">
                 <label className="text-[10px] font-bold text-blue-500 dark:text-blue-400 uppercase">New Category Name</label>
-                <input 
+                <input
                   required autoFocus
-                  className="w-full border-2 border-blue-100 dark:border-blue-900 h-14 px-4 rounded-xl focus:ring-4 ring-blue-50 dark:ring-blue-900/20 outline-none transition-all bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100" 
+                  className="w-full border-2 border-blue-100 dark:border-blue-900 h-14 px-4 rounded-xl focus:ring-4 ring-blue-50 dark:ring-blue-900/20 outline-none transition-all bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100"
                   placeholder="e.g. Hydraulics"
                   value={manualCategoryName}
                   onChange={e => setManualCategoryName(e.target.value)}
@@ -328,41 +327,40 @@ const InventoryList: React.FC<InventoryListProps> = ({
             )}
             <div className="space-y-1">
               <label className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase">SKU / Serial</label>
-              <input 
+              <input
                 readOnly={categorySelection !== 'MANUAL'}
-                className={`w-full border-2 h-14 px-4 rounded-xl outline-none transition-all font-mono ${
-                  categorySelection === 'MANUAL' 
-                  ? 'border-orange-100 dark:border-orange-900 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100' 
+                className={`w-full border-2 h-14 px-4 rounded-xl outline-none transition-all font-mono ${categorySelection === 'MANUAL'
+                  ? 'border-orange-100 dark:border-orange-900 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100'
                   : 'border-slate-50 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50 text-slate-500 dark:text-slate-600'
-                }`} 
+                  }`}
                 value={newItem.sku}
-                onChange={e => setNewItem({...newItem, sku: e.target.value.toUpperCase()})}
+                onChange={e => setNewItem({ ...newItem, sku: e.target.value.toUpperCase() })}
               />
             </div>
             <div className="space-y-1">
               <label className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase">Product Name</label>
-              <input 
+              <input
                 required
-                className="w-full border-2 border-slate-100 dark:border-slate-800 h-14 px-4 rounded-xl focus:ring-4 ring-blue-50 dark:ring-blue-900/20 outline-none transition-all bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100" 
+                className="w-full border-2 border-slate-100 dark:border-slate-800 h-14 px-4 rounded-xl focus:ring-4 ring-blue-50 dark:ring-blue-900/20 outline-none transition-all bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100"
                 placeholder="Item Name"
                 value={newItem.name}
-                onChange={e => setNewItem({...newItem, name: e.target.value})}
+                onChange={e => setNewItem({ ...newItem, name: e.target.value })}
               />
             </div>
             <div className="space-y-1">
-              <QuantityStepper 
-                label="Quantity" 
-                value={newItem.quantity || 1} 
-                onChange={(val) => setNewItem({...newItem, quantity: val})}
+              <QuantityStepper
+                label="Quantity"
+                value={newItem.quantity || 1}
+                onChange={(val) => setNewItem({ ...newItem, quantity: val })}
               />
             </div>
             <div className="space-y-1">
               <label className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase">Storage Location</label>
-              <input 
-                className="w-full border-2 border-slate-100 dark:border-slate-800 h-14 px-4 rounded-xl focus:ring-4 ring-blue-50 dark:ring-blue-900/20 outline-none transition-all bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100" 
+              <input
+                className="w-full border-2 border-slate-100 dark:border-slate-800 h-14 px-4 rounded-xl focus:ring-4 ring-blue-50 dark:ring-blue-900/20 outline-none transition-all bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100"
                 placeholder="Shelf B1"
                 value={newItem.location}
-                onChange={e => setNewItem({...newItem, location: e.target.value})}
+                onChange={e => setNewItem({ ...newItem, location: e.target.value })}
               />
             </div>
             <div className="flex items-end">
@@ -410,8 +408,8 @@ const InventoryList: React.FC<InventoryListProps> = ({
                       <div className="flex flex-col">
                         <div className="text-sm font-bold text-slate-800 dark:text-slate-100">{item.availableQuantity} / {item.quantity}</div>
                         <div className="w-24 bg-slate-100 dark:bg-slate-800 rounded-full h-1.5 mt-1 overflow-hidden">
-                          <div 
-                            className={`h-full ${item.availableQuantity === 0 ? 'bg-red-500' : 'bg-blue-500'}`} 
+                          <div
+                            className={`h-full ${item.availableQuantity === 0 ? 'bg-red-500' : 'bg-blue-500'}`}
                             style={{ width: `${(item.availableQuantity / item.quantity) * 100}%` }}
                           ></div>
                         </div>
@@ -427,7 +425,7 @@ const InventoryList: React.FC<InventoryListProps> = ({
                       <div className="flex items-center space-x-1">
                         {confirmDeleteId === item.id ? (
                           <div className="flex items-center bg-white dark:bg-slate-800 border-2 border-red-200 dark:border-red-900 rounded-xl shadow-md overflow-hidden animate-in fade-in zoom-in-95">
-                            <button 
+                            <button
                               onClick={() => { onDeleteItem(item.id); setConfirmDeleteId(null); }}
                               className="px-4 py-3 text-[10px] font-black bg-red-600 text-white hover:bg-red-700 transition-colors flex items-center uppercase"
                             >
@@ -461,7 +459,7 @@ const InventoryList: React.FC<InventoryListProps> = ({
                           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                             <div className="flex flex-col">
                               <label className="text-[10px] font-bold text-indigo-600 dark:text-indigo-400 uppercase mb-1 ml-1">Category</label>
-                              <select 
+                              <select
                                 className="border-2 border-indigo-200 dark:border-indigo-900 h-14 px-4 rounded-xl bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 outline-none"
                                 value={editCategorySelection}
                                 onChange={e => setEditCategorySelection(e.target.value)}
@@ -472,7 +470,7 @@ const InventoryList: React.FC<InventoryListProps> = ({
                             </div>
                             <div className="flex flex-col">
                               <label className="text-[10px] font-bold text-indigo-600 dark:text-indigo-400 uppercase mb-1 ml-1">SKU / Serial</label>
-                              <input 
+                              <input
                                 className="border-2 border-indigo-200 dark:border-indigo-900 h-14 px-4 rounded-xl bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 font-mono uppercase outline-none"
                                 value={editSku}
                                 onChange={e => setEditSku(e.target.value.toUpperCase())}
@@ -480,7 +478,7 @@ const InventoryList: React.FC<InventoryListProps> = ({
                             </div>
                             <div className="flex flex-col">
                               <label className="text-[10px] font-bold text-indigo-600 dark:text-indigo-400 uppercase mb-1 ml-1">Storage Location</label>
-                              <input 
+                              <input
                                 className="border-2 border-indigo-200 dark:border-indigo-900 h-14 px-4 rounded-xl bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 outline-none"
                                 value={editLocation}
                                 onChange={e => setEditLocation(e.target.value)}

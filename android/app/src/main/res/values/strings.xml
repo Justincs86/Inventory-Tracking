@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">maintenance-tracking</string>
+    <string name="title_activity_main">maintenance-tracking</string>
+    <string name="package_name">com.example.maintrack</string>
+    <string name="custom_url_scheme">com.example.maintrack</string>
+</resources>

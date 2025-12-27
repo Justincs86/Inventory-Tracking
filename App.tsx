@@ -1,11 +1,11 @@
 
 import React, { useState, useEffect, useMemo } from 'react';
-import { 
-  Package, 
-  UserPlus, 
-  History, 
-  LayoutDashboard, 
-  PlusCircle, 
+import {
+  Package,
+  UserPlus,
+  History,
+  LayoutDashboard,
+  PlusCircle,
   ArrowLeftRight,
   ClipboardList,
   Search,
@@ -13,9 +13,10 @@ import {
   FileSpreadsheet,
   ShieldAlert,
   Moon,
-  Sun
+  Sun,
+  LogOut
 } from 'lucide-react';
-import { InventoryItem, BorrowRecord, TransactionLog, ReturnCondition } from './types';
+import { InventoryItem, BorrowRecord, TransactionLog, ReturnCondition, AppUser } from './types';
 import Dashboard from './components/Dashboard';
 import InventoryList from './components/InventoryList';
 import BorrowForm from './components/BorrowForm';
@@ -23,10 +24,11 @@ import ActiveLoans from './components/ActiveLoans';
 import HistoryLog from './components/HistoryLog';
 import IncidentLog from './components/IncidentLog';
 
+// Main App Component
 const App: React.FC = () => {
   const [view, setView] = useState<'dashboard' | 'inventory' | 'borrow' | 'loans' | 'history' | 'incidents'>('dashboard');
   const [isDarkMode, setIsDarkMode] = useState(() => localStorage.getItem('mainti_theme') === 'dark');
-  
+
   const [inventory, setInventory] = useState<InventoryItem[]>(() => {
     const saved = localStorage.getItem('mainti_inventory');
     return saved ? JSON.parse(saved) : [
@@ -68,12 +70,16 @@ const App: React.FC = () => {
     }
   }, [isDarkMode]);
 
+
   const toggleTheme = () => setIsDarkMode(!isDarkMode);
+
+  const handleLogin = (user: AppUser) => setCurrentUser(user);
+  const handleLogout = () => setCurrentUser(null);
 
   const handleBorrow = (newLoan: BorrowRecord, qty: number) => {
     setLoans(prev => [...prev, newLoan]);
-    setInventory(prev => prev.map(item => 
-      item.id === newLoan.itemId 
+    setInventory(prev => prev.map(item =>
+      item.id === newLoan.itemId
         ? { ...item, availableQuantity: item.availableQuantity - qty }
         : item
     ));
@@ -84,6 +90,7 @@ const App: React.FC = () => {
       itemName: newLoan.itemName,
       quantity: qty,
       user: newLoan.specialistName,
+      operator: 'System',
       timestamp: new Date().toISOString(),
       notes: `Borrowed ${qty} units for ${newLoan.department}`,
       proofImage: newLoan.borrowProof
@@ -96,7 +103,7 @@ const App: React.FC = () => {
     const loan = loans.find(l => l.id === loanId);
     if (!loan) return;
 
-    const totalBorrowedAtStart = loan.quantity || 1; 
+    const totalBorrowedAtStart = loan.quantity || 1;
     const balanceRemaining = totalBorrowedAtStart - processedQty;
 
     // 1. Update Loans State: Only remove if no units remain
@@ -105,7 +112,7 @@ const App: React.FC = () => {
     } else {
       setLoans(prev => prev.map(l => l.id === loanId ? { ...l, quantity: balanceRemaining } : l));
     }
-    
+
     // 2. Update Inventory State
     setInventory(prev => prev.map(item => {
       if (item.id === loan.itemId) {
@@ -123,11 +130,11 @@ const App: React.FC = () => {
           // No change to availableQuantity, total stays same
         }
 
-        return { 
-          ...item, 
+        return {
+          ...item,
           quantity: updatedTotalQuantity,
-          availableQuantity: updatedAvailableQuantity, 
-          lastUpdated: new Date().toISOString() 
+          availableQuantity: updatedAvailableQuantity,
+          lastUpdated: new Date().toISOString()
         };
       }
       return item;
@@ -141,6 +148,7 @@ const App: React.FC = () => {
       itemName: loan.itemName,
       quantity: processedQty,
       user: loan.specialistName,
+      operator: 'System',
       timestamp: new Date().toISOString(),
       condition: condition,
       proofImage: proof,
@@ -157,8 +165,8 @@ const App: React.FC = () => {
 
     const existing = inventory.find(i => i.sku === newItem.sku);
     if (existing) {
-      setInventory(prev => prev.map(i => 
-        i.sku === newItem.sku 
+      setInventory(prev => prev.map(i =>
+        i.sku === newItem.sku
           ? { ...i, quantity: i.quantity + (newItem.quantity || 0), availableQuantity: i.availableQuantity + (newItem.quantity || 0), lastUpdated: new Date().toISOString() }
           : i
       ));
@@ -182,7 +190,8 @@ const App: React.FC = () => {
       itemId: existing?.id || 'new',
       itemName: newItem.name || 'Stock Update',
       quantity: newItem.quantity || 0,
-      user: 'Store Manager',
+      user: 'System',
+      operator: 'System',
       timestamp: new Date().toISOString(),
       notes: 'Received new stock shipment'
     };
@@ -198,14 +207,15 @@ const App: React.FC = () => {
       if (item.id === itemId) {
         const currentlyBorrowed = item.quantity - item.availableQuantity;
         const newAvailable = Math.max(0, newTotal - currentlyBorrowed);
-        
+
         const log: TransactionLog = {
           id: Math.random().toString(36).substr(2, 9),
           type: 'ADJUST',
           itemId: item.id,
           itemName: item.name,
-          quantity: newTotal - item.quantity, 
-          user: 'Store Manager',
+          quantity: newTotal - item.quantity,
+          user: 'System',
+          operator: currentUser?.name || 'Unknown',
           timestamp: new Date().toISOString(),
           notes: `Stock adjustment/Update. Reason: ${reason}`
         };
@@ -235,14 +245,15 @@ const App: React.FC = () => {
     }
 
     setInventory(prev => prev.filter(i => i.id !== itemId));
-    
+
     const log: TransactionLog = {
       id: Math.random().toString(36).substr(2, 9),
       type: 'ADJUST',
       itemId: itemToDelete.id,
       itemName: itemToDelete.name,
       quantity: -itemToDelete.quantity,
-      user: 'Store Manager',
+      user: 'System',
+      operator: currentUser?.name || 'Unknown',
       timestamp: new Date().toISOString(),
       notes: `Permanently removed item "${itemToDelete.name}" from store records.`
     };
@@ -260,7 +271,7 @@ const App: React.FC = () => {
       const confirmMove = window.confirm(`There are ${itemsInCategory.length} items in "${categoryName}". Deleting this category will move them to "General". Proceed?`);
       if (!confirmMove) return;
 
-      setInventory(prev => prev.map(item => 
+      setInventory(prev => prev.map(item =>
         item.category === categoryName ? { ...item, category: 'General' } : item
       ));
     }
@@ -276,15 +287,16 @@ const App: React.FC = () => {
             <Package className="w-8 h-8 text-blue-400" />
             <h1 className="text-xl font-bold tracking-tight">MaintiTrack</h1>
           </div>
-          <button 
+          <button
             onClick={toggleTheme}
             className="p-2 hover:bg-slate-800 rounded-lg transition-colors md:hidden"
           >
             {isDarkMode ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
           </button>
         </div>
-        
-        <nav className="mt-6 px-4 space-y-2">
+
+
+        <nav className="mt-2 px-4 space-y-2">
           <button onClick={() => setView('dashboard')} className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors ${view === 'dashboard' ? 'bg-blue-600' : 'hover:bg-slate-800'}`}>
             <LayoutDashboard className="w-5 h-5" />
             <span>Dashboard</span>
@@ -313,7 +325,7 @@ const App: React.FC = () => {
         </nav>
 
         <div className="absolute bottom-8 left-4 right-4 hidden md:block">
-          <button 
+          <button
             onClick={toggleTheme}
             className="w-full flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors bg-slate-800 hover:bg-slate-700 text-slate-300"
           >
@@ -334,12 +346,12 @@ const App: React.FC = () => {
         <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
           {view === 'dashboard' && <Dashboard inventory={inventory} loans={loans} history={history} isDarkMode={isDarkMode} />}
           {view === 'inventory' && (
-            <InventoryList 
-              inventory={inventory} 
+            <InventoryList
+              inventory={inventory}
               categories={customCategories}
-              onAddStock={handleReceiveStock} 
-              onAdjustStock={handleAdjustStock} 
-              onDeleteItem={handleDeleteItem} 
+              onAddStock={handleReceiveStock}
+              onAdjustStock={handleAdjustStock}
+              onDeleteItem={handleDeleteItem}
               onDeleteCategory={handleDeleteCategory}
             />
           )}

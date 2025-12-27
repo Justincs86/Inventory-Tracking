@@ -11,6 +11,27 @@
     body {
       font-family: 'Inter', sans-serif;
     }
+    
+    /* Strict Camera Enforcement: Hide Gallery/Photo selection in Capacitor PWA Elements */
+    pwa-camera-modal-instance {
+      --pwa-camera-modal-z-index: 9999;
+    }
+    
+    /* Target and hide any tab or button that allows file/gallery picking */
+    pwa-camera {
+      --pwa-camera-gallery-display: none !important;
+    }
+    
+    /* Advanced selector for the shadow DOM of PWA Elements */
+    ::part(gallery-button), 
+    .gallery-tab, 
+    [aria-label="Photos"],
+    .photo-library-button {
+      display: none !important;
+      visibility: hidden !important;
+      opacity: 0 !important;
+      pointer-events: none !important;
+    }
   </style>
   <script>
     // Initial theme setup to prevent flash

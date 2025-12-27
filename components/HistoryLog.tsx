@@ -39,6 +39,7 @@ const HistoryLog: React.FC<HistoryLogProps> = ({ history }) => {
                 <th className="px-6 py-3 text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Item</th>
                 <th className="px-6 py-3 text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Qty Delta</th>
                 <th className="px-6 py-3 text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Proof</th>
+                <th className="px-6 py-3 text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">User</th>
                 <th className="px-6 py-3 text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Condition</th>
                 <th className="px-6 py-3 text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Notes</th>
               </tr>
@@ -53,12 +54,11 @@ const HistoryLog: React.FC<HistoryLogProps> = ({ history }) => {
                       {new Date(log.timestamp).toLocaleString([], { year: 'numeric', month: 'short', day: '2-digit', hour: '2-digit', minute: '2-digit' })}
                     </td>
                     <td className="px-6 py-3">
-                      <span className={`flex items-center font-bold ${
-                        log.type === 'RECEIVE' ? 'text-green-600 dark:text-green-400' :
+                      <span className={`flex items-center font-bold ${log.type === 'RECEIVE' ? 'text-green-600 dark:text-green-400' :
                         log.type === 'BORROW' ? 'text-blue-600 dark:text-blue-400' :
-                        log.type === 'RETURN' ? 'text-amber-600 dark:text-amber-400' : 
-                        log.type === 'ADJUST' ? 'text-indigo-600 dark:text-indigo-400' : 'text-slate-600'
-                      }`}>
+                          log.type === 'RETURN' ? 'text-amber-600 dark:text-amber-400' :
+                            log.type === 'ADJUST' ? 'text-indigo-600 dark:text-indigo-400' : 'text-slate-600'
+                        }`}>
                         {log.type === 'ADJUST' ? <Settings2 className="w-3 h-3 mr-1" /> : <ArrowUpRight className="w-3 h-3 mr-1" />}
                         {log.type}
                       </span>
@@ -67,7 +67,7 @@ const HistoryLog: React.FC<HistoryLogProps> = ({ history }) => {
                     <td className="px-6 py-3 font-bold text-slate-800 dark:text-slate-200">{log.quantity > 0 ? `+${log.quantity}` : log.quantity}</td>
                     <td className="px-6 py-3">
                       {log.proofImage ? (
-                        <button 
+                        <button
                           onClick={() => setPreviewImage(log.proofImage!)}
                           className="p-1 border dark:border-slate-700 rounded bg-slate-50 dark:bg-slate-800 hover:bg-blue-50 dark:hover:bg-blue-900/30 hover:border-blue-200 dark:hover:border-blue-700 transition-colors"
                         >
@@ -77,6 +77,7 @@ const HistoryLog: React.FC<HistoryLogProps> = ({ history }) => {
                         <div className="text-slate-300 dark:text-slate-700"><ImageIcon className="w-4 h-4" /></div>
                       )}
                     </td>
+                    <td className="px-6 py-3 text-slate-500 dark:text-slate-400 truncate max-w-[100px]">{log.user || '-'}</td>
                     <td className="px-6 py-3">
                       <div className="flex items-center text-slate-800 dark:text-slate-200">
                         {getConditionIcon(log.condition)}
@@ -95,7 +96,7 @@ const HistoryLog: React.FC<HistoryLogProps> = ({ history }) => {
       {previewImage && (
         <div className="fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-in fade-in duration-200" onClick={() => setPreviewImage(null)}>
           <div className="relative max-w-2xl w-full bg-white dark:bg-slate-900 rounded-2xl p-2 shadow-2xl animate-in zoom-in-95" onClick={e => e.stopPropagation()}>
-            <button 
+            <button
               onClick={() => setPreviewImage(null)}
               className="absolute -top-12 right-0 text-white hover:text-red-400 transition-colors"
             >

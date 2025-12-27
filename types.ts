@@ -33,15 +33,26 @@ export interface BorrowRecord {
   borrowProof?: string; // New field for base64 image
 }
 
+export type UserRole = 'ADMIN' | 'MEMBER';
+
+export interface AppUser {
+  id: string;
+  name: string;
+  role: UserRole;
+  pin?: string;
+  avatar?: string;
+}
+
 export interface TransactionLog {
   id: string;
-  type: 'RECEIVE' | 'BORROW' | 'RETURN' | 'ADJUST';
+  type: 'RECEIVE' | 'BORROW' | 'RETURN' | 'ADJUST' | 'DELETE' | 'ADD';
   itemId: string;
   itemName: string;
   quantity: number;
-  user: string;
+  user: string; // The person borrowing/returning (Specialist)
+  operator: string; // The person performing the action in the app (Admin/Member)
   timestamp: string;
   notes?: string;
   condition?: ReturnCondition;
-  proofImage?: string; // New field for base64 image
+  proofImage?: string;
 }
